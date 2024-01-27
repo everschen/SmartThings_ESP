@@ -71,6 +71,15 @@ SELECT
 
 // Variadic function that will execute the query selected with passed parameters
 bool queryExecute(DataQuery_t& data, const char* queryStr, ...) {
+
+  if (!sql.connected()){
+      if (sql.connect(user, password, database)) {
+        Serial.println();
+      }
+      Serial.println();
+      delay(2000);
+  }
+
   if (sql.connected()) {
     char buf[MAX_QUERY_LEN];
     va_list args;
@@ -82,6 +91,7 @@ bool queryExecute(DataQuery_t& data, const char* queryStr, ...) {
     // Execute the query
     return sql.query(data, buf);
   }
+
   return false;
 }
 
@@ -175,7 +185,7 @@ void setup() {
   delay(2000);
 
   //update delay value once, and comment it after it take effect.
-  //insert_or_update_delay_value_for_this_device(WiFi.macAddress().c_str(), 0);
+  //insert_or_update_delay_value_for_this_device(WiFi.macAddress().c_str(), 14000);
 
   //get delay value from db.
   delay_value = get_delay_value_from_db(WiFi.macAddress().c_str());
