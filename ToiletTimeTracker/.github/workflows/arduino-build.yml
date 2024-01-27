@@ -1,0 +1,23 @@
+name: Arduino Build
+
+on:
+  push:
+    branches:
+      - main  # 适应你的分支
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Arduino CLI
+      uses: per1234/setup-arduino@v2
+      with:
+        arduino-version: 'latest'
+
+    - name: Build sketch
+      run: |
+        arduino-cli compile --fqbn your:board:definition
