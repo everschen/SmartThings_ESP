@@ -20,4 +20,4 @@ jobs:
 
     - name: Build sketch
       run: |
-        arduino-cli compile --fqbn your:board:definition
+        arduino-cli compile --fqbn arduino:esp32:esp32-wroom-32
