@@ -1,28 +1,58 @@
-name: Compile Sketch
-
-# The workflow will run on every push and pull request to the repository
+name: Compile Examples
 on:
   - push
   - pull_request
 
 jobs:
-  compile-sketch:
+  build:
     runs-on: ubuntu-latest
 
-    steps:
-      # This step makes the contents of the repository available to the workflow
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    strategy:
+      matrix:
+        fqbn:
+          - arduino:samd:mkrwifi1010
+          - arduino:samd:nano_33_iot
+          - arduino:megaavr:uno2018:mode=on
+          - arduino:mbed:nano33ble
+          - arduino:mbed_nano:nanorp2040connect
+          - arduino:renesas_uno:unor4wifi
 
-      # For more information: https://github.com/arduino/compile-sketches#readme
-      - name: Compile sketch
-        uses: arduino/compile-sketches@v1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/compile-sketches@v1
         with:
-          # The default is to compile for the Arduino Uno board. If you want to compile for other boards, use the `fqbn` input.
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          fqbn: ${{ matrix.fqbn }}
+          
+  build-for-esp32:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        fqbn:
+          - esp32:esp32:esp32
+          - esp32:esp32:esp32s3
+          - esp32:esp32:esp32c3
+          # future bluetooth chips
+          #- esp32:esp32:esp32c2
+          #- esp32:esp32:esp32c6
+          #- esp32:esp32:esp32h2
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: arduino/compile-sketches@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          fqbn: ${{ matrix.fqbn }}
+          platforms: |
+            - name: esp32:esp32
+              source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
           sketch-paths: |
-            # Configure the action to search all folders under the root of the repository for sketches and compile them.
-            # This is formatted as a YAML list, which makes it possible to have multiple sketch paths if needed.
-            - ./
-          libraries: |
-            # The "blink" sketch being compiled in this demo doesn't use any libraries, so just use an empty list
-            -
+            - examples/Central/Scan
+            - examples/Central/PeripheralExplorer
+            - examples/Central/ScanCallback
+            - examples/Central/SensorTagButton
+            - examples/Peripheral/Advertising/EnhancedAdvertising
+            - examples/Peripheral/Advertising/RawDataAdvertising
+          cli-compile-flags: |
+            - --warnings="none"
