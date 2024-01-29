@@ -1,27 +1,29 @@
-name: Compile Examples
+name: Compile Sketch
+
+# The workflow will run on every push and pull request to the repository
 on:
   - push
   - pull_request
 
-jobs:     
-  build-for-esp32:
+jobs:
+  compile-sketch:
     runs-on: ubuntu-latest
-    
-    strategy:
-      matrix:
-        fqbn:
-          - esp32:esp32:esp32
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: arduino/compile-sketches@v1
+      # This step makes the contents of the repository available to the workflow
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # For more information: https://github.com/arduino/compile-sketches#readme
+      - name: Compile sketch
+        uses: arduino/compile-sketches@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          fqbn: ${{ matrix.fqbn }}
-          platforms: |
-            - name: esp32:esp32
-              source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+          # The default is to compile for the Arduino Uno board. If you want to compile for other boards, use the `fqbn` input.
           sketch-paths: |
-            - everschen/SmartThings_ESP/ToiletTimeTracker
-          cli-compile-flags: |
-            - --warnings="none"
+            # Configure the action to search all folders under the root of the repository for sketches and compile them.
+            # This is formatted as a YAML list, which makes it possible to have multiple sketch paths if needed.
+            - ./
+          libraries: |
+            # The "blink" sketch being compiled in this demo doesn't use any libraries, so just use an empty list
+            - name: WiFiNINA
+            - name: Arduino_ESP32_OTA
