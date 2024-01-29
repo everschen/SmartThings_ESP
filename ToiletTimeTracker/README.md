@@ -1,3 +1,14 @@
+ToiletTimeTracker:
+1. Use esp32 to record the time and duration time in the toilet.
+2. Insert this record to the DB.
+3. Adjusting the delay time of HC-SR501.
+
+
+
+Application to utilize this data.
+1. Notify the time and duration of long use of specified toilet.  //handle_toilet_db.py
+
+
 ![1706414588664](https://github.com/everschen/SmartThings_ESP/assets/26154786/8d40e798-2206-4514-95f6-5f25a7f514b3)
 ![1706414556272](https://github.com/everschen/SmartThings_ESP/assets/26154786/5cb2536e-847a-4ba3-b9f4-3cd80ef45e4e)
 ![1706414793034](https://github.com/everschen/SmartThings_ESP/assets/26154786/825a7357-bb59-44eb-8c7f-c3ce32d4f50d)
