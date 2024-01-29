@@ -27,3 +27,4 @@ jobs:
             # The "blink" sketch being compiled in this demo doesn't use any libraries, so just use an empty list
             - name: WiFiNINA
             - name: Arduino_ESP32_OTA
+            - name: mysql2
