@@ -27,4 +27,4 @@ jobs:
             # The "blink" sketch being compiled in this demo doesn't use any libraries, so just use an empty list
             - name: WiFiNINA
             - name: Arduino_ESP32_OTA
-            - name: --git-url https://downloads.arduino.cc/libraries/github.com/ChuckBell/MySQL_Connector_Arduino-1.2.0.zip
+            - name: --git-url https://github.com/ChuckBell/MySQL_Connector_Arduino/archive/refs/tags/1.2.0.zip
