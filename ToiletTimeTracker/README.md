@@ -3,3 +3,4 @@
 ![1706414793034](https://github.com/everschen/SmartThings_ESP/assets/26154786/825a7357-bb59-44eb-8c7f-c3ce32d4f50d)
 ![1706414770140](https://github.com/everschen/SmartThings_ESP/assets/26154786/434186f7-d286-43fd-a7f0-330af6016b1d)
 ![1706417981606](https://github.com/everschen/SmartThings_ESP/assets/26154786/a28d8fd4-4b25-4ea5-b719-5f71e501cfc8)
+<img width="566" alt="db" src="https://github.com/everschen/SmartThings_ESP/assets/26154786/eda10a73-008b-4da1-a1b5-7b5edc3c3dbc">
