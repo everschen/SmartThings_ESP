@@ -28,3 +28,4 @@ jobs:
             - name: WiFiNINA
             - name: Arduino_ESP32_OTA
             - name: "MySQL Connector Arduino"
+            - name: "MySQL Query Client"
