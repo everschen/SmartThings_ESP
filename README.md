@@ -4,8 +4,7 @@ ToiletTimeTracker:
 3. Adjusting the delay time of HC-SR501.
 
 
-To be done for ToiletTimeTracker:
-1. Develop an application to utilize this data.
+Develop an application to utilize this data.
   1. Notify the time and duration of long use of specified toilet.  //handle_toilet_db.py
   2. to be added
 
