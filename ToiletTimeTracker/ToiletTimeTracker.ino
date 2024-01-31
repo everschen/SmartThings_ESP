@@ -71,7 +71,7 @@ SELECT
 )string_literal";
 
 static const char selectMaxToiletIdQuery[] PROGMEM = R"string_literal(
-SELECT MAX(toilet_id) AS max_toilet_id FROM device_specific_parameters;
+SELECT MAX(toilet_id) AS max_toilet_id FROM %s;
 )string_literal";
 
 
@@ -171,15 +171,17 @@ void get_params_from_db(const char* mac_addr, unsigned long *delay, unsigned lon
       //insert
       Serial.print("Param not existed for device: ");
       Serial.println(mac_addr);
+      data.clear();
 
       if (queryExecute(data, selectMaxToiletIdQuery, device_param_table)) {
         if (data.recordCount) {
           Serial.print("max_toilet_id = ");
-          Serial.print(data.getRowValue(0, "max_toilet_id"));
+          Serial.println(data.getRowValue(0, "max_toilet_id"));
           *toilet_id = atoi(data.getRowValue(0, "max_toilet_id")) + 1;
         }
       }
 
+      data.clear();
       if (queryExecute(data, insertParamQuery, device_param_table,
           WiFi.macAddress().c_str(),
           *delay, *toilet_id)
@@ -246,6 +248,7 @@ void loop() {
       Serial.print("Motion detected! current time:");	// print on output change
       Serial.println(c_time_start);	// print on output change
       pirState = HIGH;
+      get_params_from_db(WiFi.macAddress().c_str(), &delay_value, &toilet_id);
     }
   } 
   else 
