@@ -102,56 +102,56 @@ bool queryExecute(DataQuery_t& data, const char* queryStr, ...) {
   return false;
 }
 
-int insert_or_update_delay_value_for_this_device(const char* mac_addr, int delay) {
-    DataQuery_t data;
+// int insert_or_update_delay_value_for_this_device(const char* mac_addr, int delay) {
+//     DataQuery_t data;
 
-    if (queryExecute(data, selectParamQuery, device_param_table, mac_addr)) {
-      Serial.println("selectParamQuery executed.");
-      if (data.recordCount) {
-        // Print formatted content of table
-        sql.printResult(data);
-        Serial.print('\n');
-        Serial.print("delay in db = ");
-        Serial.println(data.getRowValue(0, "delay_value"));
+//     if (queryExecute(data, selectParamQuery, device_param_table, mac_addr)) {
+//       Serial.println("selectParamQuery executed.");
+//       if (data.recordCount) {
+//         // Print formatted content of table
+//         sql.printResult(data);
+//         Serial.print('\n');
+//         Serial.print("delay in db = ");
+//         Serial.println(data.getRowValue(0, "delay_value"));
 
-        //update
-        if (delay != atoi(data.getRowValue(0, "delay_value"))) {
-          if (queryExecute(data, updateParamQuery, device_param_table, delay, mac_addr)) {
-            Serial.print("updateParamQuery executed. New Param added: mac_addr=");
-            Serial.print(mac_addr);
-            Serial.print(" delay=");
-            Serial.println(delay);
-          }
-        }
-        else {
-          Serial.println("same delay value, don't need to update again.");
-        }
+//         //update
+//         if (delay != atoi(data.getRowValue(0, "delay_value"))) {
+//           if (queryExecute(data, updateParamQuery, device_param_table, delay, mac_addr)) {
+//             Serial.print("updateParamQuery executed. New Param added: mac_addr=");
+//             Serial.print(mac_addr);
+//             Serial.print(" delay=");
+//             Serial.println(delay);
+//           }
+//         }
+//         else {
+//           Serial.println("same delay value, don't need to update again.");
+//         }
 
-      }
-    }
-    else
-    {
-      //insert
-      Serial.print("Param not existed for device: ");
-      Serial.println(mac_addr);
+//       }
+//     }
+//     else
+//     {
+//       //insert
+//       Serial.print("Param not existed for device: ");
+//       Serial.println(mac_addr);
 
-      if (queryExecute(data, insertParamQuery, device_param_table,
-          WiFi.macAddress().c_str(),
-          delay)
-      )
-      {
-        Serial.print("insertParamQuery executed. New Param added: mac_addr=");
-        Serial.print(mac_addr);
-        Serial.print(" delay=");
-        Serial.println(delay);
-      }
-      Serial.println();
+//       if (queryExecute(data, insertParamQuery, device_param_table,
+//           WiFi.macAddress().c_str(),
+//           delay)
+//       )
+//       {
+//         Serial.print("insertParamQuery executed. New Param added: mac_addr=");
+//         Serial.print(mac_addr);
+//         Serial.print(" delay=");
+//         Serial.println(delay);
+//       }
+//       Serial.println();
 
-    }
+//     }
 
-    Serial.print('\n');
-    return delay;
-}
+//     Serial.print('\n');
+//     return delay;
+// }
 
 void get_params_from_db(const char* mac_addr, unsigned long *delay, unsigned long *toilet_id) {
     DataQuery_t data;
@@ -248,6 +248,8 @@ void loop() {
       Serial.print("Motion detected! current time:");	// print on output change
       Serial.println(c_time_start);	// print on output change
       pirState = HIGH;
+    }
+    else {
       get_params_from_db(WiFi.macAddress().c_str(), &delay_value, &toilet_id);
     }
   } 
