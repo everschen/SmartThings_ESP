@@ -39,6 +39,7 @@ int pirState = LOW;             // we start, assuming no motion detected
 int val = 0;                    // variable for reading the pin status
 unsigned long c_time, c_time_start;
 unsigned long delay_value = 0;
+unsigned long toilet_id = 0;
 
 static const char insertToiletQuery[] PROGMEM = R"string_literal(
 INSERT INTO `%s`
@@ -49,8 +50,8 @@ INSERT INTO `%s`
 
 static const char insertParamQuery[] PROGMEM = R"string_literal(
 INSERT INTO `%s`
-  (`mac_addr`, `delay_value`)
-  VALUES ('%s', '%lu');
+  (`mac_addr`, `delay_value`, `toilet_id`)
+  VALUES ('%s', '%lu', '%lu');
 )string_literal";
 
 static const char updateParamQuery[] PROGMEM = R"string_literal(
@@ -62,11 +63,17 @@ UPDATE `%s` SET
 static const char selectParamQuery[] PROGMEM = R"string_literal(
 SELECT
   `mac_addr`,
-  `delay_value`
+  `delay_value`,
+  `toilet_id`
   FROM %s
   WHERE mac_addr = '%s'
   ORDER BY id DESC LIMIT 1;
 )string_literal";
+
+static const char selectMaxToiletIdQuery[] PROGMEM = R"string_literal(
+SELECT MAX(toilet_id) AS max_toilet_id FROM device_specific_parameters;
+)string_literal";
+
 
 
 // Variadic function that will execute the query selected with passed parameters
@@ -146,17 +153,48 @@ int insert_or_update_delay_value_for_this_device(const char* mac_addr, int delay
     return delay;
 }
 
-int get_delay_value_from_db(const char* mac_addr) {
+void get_params_from_db(const char* mac_addr, unsigned long *delay, unsigned long *toilet_id) {
     DataQuery_t data;
-    int delay = 0;
+    *delay = 0;
+    *toilet_id = 0;
     if (queryExecute(data, selectParamQuery, device_param_table, mac_addr)) {
       if (data.recordCount) {
         Serial.print("delay_value = ");
-        Serial.println(data.getRowValue(0, "delay_value"));
-        delay = atoi(data.getRowValue(0, "delay_value"));
+        Serial.print(data.getRowValue(0, "delay_value"));
+        *delay = atoi(data.getRowValue(0, "delay_value"));
+        Serial.print(", toilet_id = ");
+        Serial.println(data.getRowValue(0, "toilet_id"));
+        *toilet_id = atoi(data.getRowValue(0, "toilet_id"));
       }
     }
-    return delay;
+    else{
+      //insert
+      Serial.print("Param not existed for device: ");
+      Serial.println(mac_addr);
+
+      if (queryExecute(data, selectMaxToiletIdQuery, device_param_table)) {
+        if (data.recordCount) {
+          Serial.print("max_toilet_id = ");
+          Serial.print(data.getRowValue(0, "max_toilet_id"));
+          *toilet_id = atoi(data.getRowValue(0, "max_toilet_id")) + 1;
+        }
+      }
+
+      if (queryExecute(data, insertParamQuery, device_param_table,
+          WiFi.macAddress().c_str(),
+          *delay, *toilet_id)
+      )
+      {
+        Serial.print("insertParamQuery executed. New Param added: mac_addr=");
+        Serial.print(mac_addr);
+        Serial.print(" delay=");
+        Serial.print(*delay);
+        Serial.print(", toilet_id=");
+        Serial.println(*toilet_id);
+      }
+      Serial.println();
+    }
+
 }
 
 void setup() {
@@ -188,7 +226,7 @@ void setup() {
   //insert_or_update_delay_value_for_this_device(WiFi.macAddress().c_str(), 14000);
 
   //get delay value from db.
-  delay_value = get_delay_value_from_db(WiFi.macAddress().c_str());
+  get_params_from_db(WiFi.macAddress().c_str(), &delay_value, &toilet_id);
 
   pinMode(ledPin, OUTPUT);      // declare LED as output
   pinMode(inputPin, INPUT);     // declare sensor as input

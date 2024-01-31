@@ -7,5 +7,3 @@ const char* dbHost = "your_db_host";       // MySQL hostname or IP address
 const char* database = "live_monitor";     // Database name
 uint16_t dbPort = 3306;                 // MySQL host port
 
-uint16_t toilet_id = 1; 
-
