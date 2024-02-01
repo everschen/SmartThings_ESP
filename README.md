@@ -1,9 +1,26 @@
 ToiletTimeTracker: 
-1. Use esp32 to record the time and duration time in the toilet.
-2. Insert this record to the DB.
-3. Adjusting the delay time of HC-SR501.
+  1. Use esp32 to record the time and duration time in the toilet.
+  2. Insert this record to the DB.
+  3. Adjusting the delay time of HC-SR501.
 
-
+Setup DB:
+  1. CREATE DATABASE live_monitor;
+  2. use live_monitor;
+  3. CREATE TABLE device_specific_parameters (
+    id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    mac_addr VARCHAR(18) NOT NULL,
+    delay_value INT UNSIGNED NOT NULL,
+    toilet_id INT
+    );
+  4. CREATE TABLE toilet (
+    id INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    duration INT NOT NULL,
+    toilet_id INT NOT NULL,
+    mac_addr VARCHAR(18) NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    send_notification TINYINT(1) DEFAULT 0
+    );
+  
 Develop an application to utilize this data.
   1. Notify the time and duration of long use of specified toilet.  //handle_toilet_db.py
   2. to be added
