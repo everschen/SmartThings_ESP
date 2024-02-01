@@ -249,9 +249,6 @@ void loop() {
       Serial.println(c_time_start);	// print on output change
       pirState = HIGH;
     }
-    else {
-      get_params_from_db(WiFi.macAddress().c_str(), &delay_value, &toilet_id);
-    }
   } 
   else 
   {
@@ -278,6 +275,7 @@ void loop() {
         Serial.println("INSERT query executed. New record added to toilet_table");
       }
       pirState = LOW;
+      get_params_from_db(WiFi.macAddress().c_str(), &delay_value, &toilet_id);
     }
   }
 }
