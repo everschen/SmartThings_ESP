@@ -23,6 +23,7 @@ Setup DB:
   
 Develop an application to utilize this data.
   1. Notify the time and duration of long use of specified toilet.  //handle_toilet_db.py
+     ![1707020318050](https://github.com/everschen/SmartThings_ESP/assets/26154786/bdcded74-6bbd-4826-80bc-e1e853714b00)
   2. to be added
 
 
