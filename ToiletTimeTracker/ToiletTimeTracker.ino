@@ -275,7 +275,7 @@ void loop() {
         Serial.println("INSERT query executed. New record added to toilet_table");
       }
       pirState = LOW;
-      get_params_from_db(WiFi.macAddress().c_str(), &delay_value, &toilet_id);
+      //get_params_from_db(WiFi.macAddress().c_str(), &delay_value, &toilet_id);
     }
   }
 }
