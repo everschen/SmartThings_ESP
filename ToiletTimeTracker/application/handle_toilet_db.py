@@ -4,7 +4,7 @@
 import smtplib
 from email.mime.text import MIMEText
 import time
-
+import argparse
 import mysql.connector
 
 #########################################################################################
@@ -20,7 +20,7 @@ DB_USER='your_db_user'
 DB_PASSWD='your_db_password'
 DB_NAME='live_monitor'
 
-STOOL_TIME_MIN = 180000 #3 minutes
+STOOL_TIME_MIN = 120000 #2 minutes
 URINE_TIME_MIN = 40000  #40 seconds
 
 #########################################################################################
@@ -66,11 +66,17 @@ def update_send_notification(id):
     connection.commit()
 
 
-print("----------------------------stool time------------------------------------------------------------")
+parser = argparse.ArgumentParser(description='add force to send eamil')
+parser.add_argument('-s', action='store_true', help='add force to send eamil')
+args = parser.parse_args()
+
+
+
+print("----------------------------all time------------------------------------------------------------")
 # 创建一个游标对象
 cursor = connection.cursor()
 table_name = 'toilet'
-query = f'SELECT * FROM {table_name} WHERE toilet_id=1 AND duration > {STOOL_TIME_MIN} AND DATE(`timestamp`) = CURDATE() order by id DESC;'
+query = f'SELECT * FROM {table_name} WHERE toilet_id=1 AND duration >= {URINE_TIME_MIN} AND DATE(`timestamp`) = CURDATE() order by id DESC;'
 cursor.execute(query)
 
 id_list = []
@@ -86,45 +92,83 @@ for row in result:
        id_list.append(id)
     seconds = duration//1000
     if firstone:
-        title = str(datetime) + "次卫卫生间使用了" + str(seconds//60) +"分钟" + str(seconds%60) + "秒 (stool)"
+        title = str(datetime) + "次卫卫生间使用了" + str(seconds//60) +"分钟" + str(seconds%60) + "秒 "
         firstone = False
-    content += str(datetime) + "   " + str(seconds//60) +"分钟" + str(seconds%60) + "秒" +"\n"
+    
+    if duration >= STOOL_TIME_MIN:
+        content += str(datetime) + "   " + str(seconds//60) +"分钟" + str(seconds%60) + "秒" +" ---> (stool?)\n"
+    else:
+        content += str(datetime) + "   " + str(seconds//60) +"分钟" + str(seconds%60) + "秒" +"\n"
 
 if id_list:
     print("since have new stool record, will notify")
     send_email(title, content, False)
     for id in id_list:
         update_send_notification(id)
+else:
+    if args.s:
+        print("force to send eamil, will notify")
+        send_email(title, content, False)
 
-print("----------------------------urine time----------------------------------------------------------")
-cursor = connection.cursor()
-table_name = 'toilet'
-query = f'SELECT * FROM {table_name} WHERE toilet_id = 1  AND duration > {URINE_TIME_MIN}  AND duration < {STOOL_TIME_MIN}  AND DATE(`timestamp`) = CURDATE() order by id DESC;'
-cursor.execute(query)
-id_list = []
-# 获取查询结果
-result = cursor.fetchall()
-content = ""
-firstone = True
-for row in result:
-    print(row)
-    #print(row.)
-    (id, duration, toilet_id, mac, datetime, send_notification) = row
-    print(duration, datetime)
-    if not send_notification:
-       id_list.append(id)
-    #send notification
-    seconds = duration//1000
-    if firstone:
-        title = str(datetime) + "次卫卫生间使用了" + str(seconds//60) +"分钟" + str(seconds%60) + "秒 (urine)"
-        firstone = False
-    content += str(datetime) + "   " + str(seconds//60) +"分钟" + str(seconds%60) + "秒" +"\n"
+# print("----------------------------stool time------------------------------------------------------------")
+# # 创建一个游标对象
+# cursor = connection.cursor()
+# table_name = 'toilet'
+# query = f'SELECT * FROM {table_name} WHERE toilet_id=1 AND duration >= {STOOL_TIME_MIN} AND DATE(`timestamp`) = CURDATE() order by id DESC;'
+# cursor.execute(query)
 
-if id_list:
-    print("since have new urine record, will notify")
-    send_email(title, content, False)
-    for id in id_list:
-        update_send_notification(id)
+# id_list = []
+# content = ""
+# firstone = True
+# result = cursor.fetchall()
+# for row in result:
+#     print(row)
+#     #print(row.)
+#     (id, duration, toilet_id, mac, datetime, send_notification) = row
+#     print(duration, datetime)
+#     if not send_notification:
+#        id_list.append(id)
+#     seconds = duration//1000
+#     if firstone:
+#         title = str(datetime) + "次卫卫生间使用了" + str(seconds//60) +"分钟" + str(seconds%60) + "秒 (stool)"
+#         firstone = False
+#     content += str(datetime) + "   " + str(seconds//60) +"分钟" + str(seconds%60) + "秒" +"\n"
+
+# if id_list:
+#     print("since have new stool record, will notify")
+#     send_email(title, content, False)
+#     for id in id_list:
+#         update_send_notification(id)
+
+# print("----------------------------urine time----------------------------------------------------------")
+# cursor = connection.cursor()
+# table_name = 'toilet'
+# query = f'SELECT * FROM {table_name} WHERE toilet_id = 1  AND duration > {URINE_TIME_MIN}  AND duration < {STOOL_TIME_MIN}  AND DATE(`timestamp`) = CURDATE() order by id DESC;'
+# cursor.execute(query)
+# id_list = []
+# # 获取查询结果
+# result = cursor.fetchall()
+# content = ""
+# firstone = True
+# for row in result:
+#     print(row)
+#     #print(row.)
+#     (id, duration, toilet_id, mac, datetime, send_notification) = row
+#     print(duration, datetime)
+#     if not send_notification:
+#        id_list.append(id)
+#     #send notification
+#     seconds = duration//1000
+#     if firstone:
+#         title = str(datetime) + "次卫卫生间使用了" + str(seconds//60) +"分钟" + str(seconds%60) + "秒 (urine)"
+#         firstone = False
+#     content += str(datetime) + "   " + str(seconds//60) +"分钟" + str(seconds%60) + "秒" +"\n"
+
+# if id_list:
+#     print("since have new urine record, will notify")
+#     send_email(title, content, False)
+#     for id in id_list:
+#         update_send_notification(id)
 
 # 关闭游标和连接
 cursor.close()
